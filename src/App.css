@@ -36,3 +36,15 @@
     transform: rotate(360deg);
   }
 }
+
+.card {
+  margin-bottom: 80px;
+}
+
+.navbarStyles {
+  background-color: #343a40;
+  color: #fff;
+  position: fixed;
+  z-index: 1000;
+  width: 100%;
+}
