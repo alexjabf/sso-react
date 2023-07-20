@@ -21,3 +21,10 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Ignore RubyMine project files
+.idea/*
+.idea.DS_Store
+
+# Ignore local SSL certificates
+certificates/*
