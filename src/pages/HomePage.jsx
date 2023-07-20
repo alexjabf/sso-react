@@ -1,6 +1,5 @@
 import React from 'react';
 import {Container, Carousel, Row, Col, Card} from 'react-bootstrap';
-
 const HomePage = () => {
     const publicUrl = process.env.PUBLIC_URL;
     return (
