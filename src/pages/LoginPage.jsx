@@ -6,11 +6,19 @@ import axios from "axios";
 import { setCookie }  from '../services/CookiesHandler';
 import { useNavigate } from 'react-router-dom';
 import {toast, ToastContainer} from "react-toastify";
+import Auth0Login from "../components/Auth0Login";
+import {loggedIn} from "../services/loggedIn";
 
-const LoginPage = () => {
+const LoginPage = ({authConfig, client}) => {
+    const currentUser = loggedIn();
     const navigate = useNavigate();
-    const [error, setError] = useState('');
 
+    if (currentUser) {
+        toast.error("You are already logged in!");
+        navigate('/profile');
+        navigate(0);
+    }
+    const [error, setError] = useState('');
     const delay = ms => new Promise(
         resolve => setTimeout(resolve, ms)
     );
@@ -38,6 +46,7 @@ const LoginPage = () => {
                 navigate('/');
                 navigate(0);
             } catch (error) {
+                toast.error("Failed to logged in!");
                 setError('Failed to login. Please review your login information and try again.');
             }
         }
@@ -48,7 +57,7 @@ const LoginPage = () => {
             <ToastContainer/>
             <Card>
                 <Card.Header className='bg-dark text-light'>
-                    <Card.Title>Sign In</Card.Title>
+                    <Card.Title>Admin Sign In</Card.Title>
                 </Card.Header>
                 <Card.Body>
                     <Form onSubmit={formik.handleSubmit}>
@@ -94,6 +103,7 @@ const LoginPage = () => {
                     </Form>
                 </Card.Body>
             </Card>
+            <Auth0Login authConfig={authConfig} client={client}/>
         </div>
     );
 };
