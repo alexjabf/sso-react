@@ -31,3 +31,14 @@ export function getCookie(name) {
     }
     return null;
 }
+
+export function getCookieAuth0(name) {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.startsWith('auth0')) {
+            return true;
+        }
+    }
+    return false;
+}

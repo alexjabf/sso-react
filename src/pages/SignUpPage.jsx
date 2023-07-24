@@ -5,7 +5,8 @@ import * as Yup from 'yup';
 import axios from "axios";
 import {setCookie} from '../services/CookiesHandler';
 import {useNavigate} from 'react-router-dom';
-import {toast} from "react-toastify";
+import {toast, ToastContainer} from "react-toastify";
+import {concatErrorMessages} from '../requests/crudOperations';
 
 const SignUpPage = () => {
     const navigate = useNavigate();
@@ -18,7 +19,8 @@ const SignUpPage = () => {
             username: '',
             password: '',
             password_confirmation: '',
-            role_id: 3,
+            role_id: 1,
+            client_id: 1,
         },
         validationSchema: Yup.object({
             first_name: Yup.string().required('First Name is required'),
@@ -41,9 +43,12 @@ const SignUpPage = () => {
                 navigate('/');
                 navigate(0);
             } catch (error) {
-                const message = error.response.data.error;
+                console.log(error.response.data.data.attributes.errors)
+                const message = Object.entries(error.response.data.data.attributes.errors).map(([key, errors]) => {
+                    return `${key.replace(/_/g, ' ')}: ${errors.join(', ')}.`;
+                }).join('. ');
                 setError('Failed to sign up. Please review your login information and try again.');
-                toast.success(message);
+                toast.error(message);
             }
         }
     });
@@ -52,7 +57,7 @@ const SignUpPage = () => {
         <div className={'container mt-4'}>
             <Card>
                 <Card.Header className='bg-dark text-light'>
-                    <Card.Title>Sign Up</Card.Title>
+                    <Card.Title>Sign Up (Admin)</Card.Title>
                 </Card.Header>
                 <Card.Body>
                     <Form onSubmit={formik.handleSubmit}>
@@ -182,6 +187,7 @@ const SignUpPage = () => {
                     </Form>
                 </Card.Body>
             </Card>
+            <ToastContainer/>
         </div>
     );
 };

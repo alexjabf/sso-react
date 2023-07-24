@@ -1,14 +1,26 @@
 import React, {useEffect, useState} from 'react';
 import {getObjects} from "../requests/crudOperations";
-import {loggedIn} from "../services/loggedIn";
+import {authorize} from "../services/loggedIn";
 import {Button, Card, Col, Form, Row, Table} from "react-bootstrap";
 import LoadingDiv from "../components/LoadingDiv";
 import PaginationLinks from '../components/PaginationLinks';
+import {Link, useNavigate} from "react-router-dom";
+import {toast} from "react-toastify";
 
 const ClientsPage = () => {
-    const currentUser = loggedIn();
+    const navigate = useNavigate();
+    const currentUser = authorize();
+
+    if (!currentUser || parseInt(currentUser.role_id) !== 1) {
+        toast.error('You are not authorized to view this page')
+        setTimeout(() => {
+            navigate('/');
+            navigate(0);
+        }, 2000);
+    }
+
     const urlSearchParams = new URLSearchParams(window.description);
-    const [clients, setClients] = useState(null);
+    const [clients, setClients] = useState([]);
     const [links, setLinks] = useState({});
     const [totalPages, setTotalPages] = useState(1);
     const [totalRecords, setTotalRecords] = useState(0);
@@ -37,10 +49,11 @@ const ClientsPage = () => {
                     name: client.attributes.name,
                     client_code: client.attributes.client_code,
                     description: client.attributes.description,
-                    custom_fields: client.attributes.custom_fields
+                    provider: client.attributes?.configuration?.provider,
+                    custom_fields: client.attributes?.configuration?.custom_fields,
                 }
             }));
-            setTotalRecords((clientsList.links.total_pages * clientsList.data.length )|| 0);
+            setTotalRecords((clientsList.links.total_pages * clientsList.data.length) || 0);
             setTotalPages(clientsList.links.total_pages);
             setLinks(clientsList.links);
         } catch (error) {
@@ -99,7 +112,7 @@ const ClientsPage = () => {
 
                         <Form onSubmit={handleFilterForm}>
                             <Row>
-                                <Col className='m-lg-3'>
+                                <Col className='m-lg-4'>
                                     <Form.Group controlId="name">
                                         <Form.Label>Company Name</Form.Label>
                                         <Form.Control
@@ -110,9 +123,9 @@ const ClientsPage = () => {
                                         />
                                     </Form.Group>
                                 </Col>
-                                <Col className='m-lg-3'>
+                                <Col className='m-lg-4'>
                                     <Form.Group controlId="client_code">
-                                        <Form.Label>Title</Form.Label>
+                                        <Form.Label>Client Code</Form.Label>
                                         <Form.Control
                                             type="text"
                                             name="client_code"
@@ -121,25 +134,14 @@ const ClientsPage = () => {
                                         />
                                     </Form.Group>
                                 </Col>
-                                <Col className='m-lg-3'>
+                                <Col className='m-lg-4'>
 
                                     <Form.Group controlId="description">
-                                        <Form.Label>Location</Form.Label>
+                                        <Form.Label>Description</Form.Label>
                                         <Form.Control
                                             type="text"
                                             name="description"
                                             value={filterValues.description || ""}
-                                            onChange={handleInputChange}
-                                        />
-                                    </Form.Group>
-                                </Col>
-                                <Col className='m-lg-3'>
-                                    <Form.Group controlId="custom_fields">
-                                        <Form.Label>Custom Fields</Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            name="custom_fields"
-                                            value={filterValues.custom_fields || ""}
                                             onChange={handleInputChange}
                                         />
                                     </Form.Group>
@@ -159,8 +161,8 @@ const ClientsPage = () => {
                                                 >
                                                     <option value="id">Id</option>
                                                     <option value="name">Company Name</option>
-                                                    <option value="description">Location</option>
-                                                    <option value="custom_fields">Custom Fields</option>
+                                                    <option value="description">Description</option>
+                                                    <option value="client_code">Client Code</option>
                                                 </Form.Control>
                                             </Form.Group>
                                         </Col>
@@ -266,7 +268,9 @@ const ClientsPage = () => {
                                 <th>Client Name</th>
                                 <th>Client Code</th>
                                 <th>Description</th>
+                                <th>Provider</th>
                                 <th>Custom Fields</th>
+                                <th>Edit Client</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -276,6 +280,7 @@ const ClientsPage = () => {
                                     <td>{client.name}</td>
                                     <td>{client.client_code}</td>
                                     <td>{client.description}</td>
+                                    <td>{client.provider}</td>
                                     <td>
                                         <ul>
                                             {Array.isArray(client.custom_fields) && client.custom_fields.map((item, index) => (
@@ -284,6 +289,9 @@ const ClientsPage = () => {
                                                 </li>
                                             ))}
                                         </ul>
+                                    </td>
+                                    <td>
+                                        <Link to={`/edit-client/${client.id}`} lassName={`btn btn-success btn-sm`}>Edit</Link>
                                     </td>
                                 </tr>
                             ))}

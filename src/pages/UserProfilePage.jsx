@@ -53,6 +53,11 @@ const UserProfilePage = () => {
                     <Card.Text>
                         <strong>Updated At:</strong> {user.updated_at}
                     </Card.Text>
+                    {Object.entries(user.custom_fields).map(([key, value]) => (
+                        <Card.Text key={key}>
+                            <strong>{key}:</strong> {value}
+                        </Card.Text>
+                    ))}
                 </Card.Body>
             </Card>
         </div>

@@ -23,7 +23,7 @@ const Logout = () => {
 
             toast.success("You have successfully logged out!");
             deleteCookie('Authorization');
-            deleteCookie('currentUser.id');
+            deleteCookie('CurrentUser');
             await delay(2000);
             window.location.href = '/';
         } catch (error) {

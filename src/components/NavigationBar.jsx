@@ -2,7 +2,6 @@ import React from 'react';
 import {Navbar, Nav} from 'react-bootstrap';
 import {loggedIn} from "../services/loggedIn";
 import Logout from "../components/Logout";
-import ClientsPage from "../pages/ClientsPage";
 
 const NavigationBar = () => {
     const currentUser = loggedIn();

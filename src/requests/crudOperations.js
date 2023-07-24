@@ -93,12 +93,23 @@ function headers(filterValues) {
 
 function handleErrors(error) {
     let error_message = '';
-    if (error.response.status === 422) {
-        error_message = concatErrorMessages(error.response.data.data.attributes.errors);
+    const { response } = error;
+    const dataAttributes = response?.data?.data?.attributes;
+    if (response.status === 422) {
+        if (dataAttributes?.errors !== undefined) {
+            console.log("ERRORS: ", dataAttributes?.errors)
+            error_message = concatErrorMessages(dataAttributes.errors);
+        }
+        if (response?.data?.data?.type === 'clients' && dataAttributes?.configuration_errors !== null) {
+            console.log("CONFIGURATION ERRORS: ", dataAttributes?.configuration_errors)
+            error_message += concatErrorMessages(dataAttributes?.configuration_errors);
+        }
     } else {
-        error_message = error.response.data.data.message;
+        error_message = dataAttributes?.message || '';
     }
-    toast.error(error_message);
+console.log(error_message)
+    if (error_message)
+        toast.error(error_message);
 }
 
 const concatErrorMessages = (errorsHash) => {
